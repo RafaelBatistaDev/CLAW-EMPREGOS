@@ -1,0 +1,24 @@
+{
+  "keywords": [
+    "Porteiro",
+    "Vigia",
+    "Auxiliar de Linha de Produção",
+    "Fiscal de Loja",
+    "Prevenção de Perdas"
+  ],
+  "localizacao": "Recife, PE",
+  "max_vagas_por_plataforma": 5,
+  "delay_entre_requisicoes": 2.5,
+  "plataformas": [
+    "gupy",
+    "linkedin",
+    "indeed",
+    "infojobs",
+    "infojobs_geo",
+    "empregope",
+    "comunidadeempregope",
+    "blogspot_pe",
+    "google_news",
+    "jobrapido"
+  ]
+}

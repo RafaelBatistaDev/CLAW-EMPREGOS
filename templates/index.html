@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Job Hunter - Vagas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0d14; --bg2: #111420; --bg3: #181c2e;
+            --surface: #1e2235; --border: #2a2f4a;
+            --accent: #4fffb0; --accent2: #3de8ff;
+            --danger: #ff4e6a; --text: #e8eaf4; --muted: #7b82a6;
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+        h1 { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; margin-bottom: 24px; letter-spacing: -0.5px; }
+
+        nav { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 28px; }
+        nav a {
+            padding: 8px 16px; border-radius: 8px;
+            background: var(--surface); border: 1px solid var(--border);
+            color: var(--muted); text-decoration: none; font-size: 14px;
+            transition: all 0.18s;
+        }
+        nav a:hover { background: var(--bg3); color: var(--text); border-color: var(--accent); }
+        nav a.btn-clear { background: rgba(255,78,106,0.1); border-color: rgba(255,78,106,0.3); color: var(--danger); }
+
+        .messages { margin-bottom: 20px; }
+        .messages ul { list-style: none; }
+        .messages li { padding: 12px 16px; border-radius: 8px; background: rgba(79,255,176,0.07); border: 1px solid rgba(79,255,176,0.2); color: var(--accent); font-size: 14px; }
+
+        .categoria { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; margin-bottom: 20px; overflow: hidden; }
+        .categoria h2 { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; padding: 16px 22px; border-bottom: 1px solid var(--border); color: var(--accent); margin: 0; }
+
+        .vaga { margin: 12px; padding: 16px; background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; }
+        .vaga h3 { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; margin: 0 0 10px; color: var(--text); }
+        .vaga p { margin: 4px 0; font-size: 13px; color: var(--muted); }
+        .vaga a { display: inline-flex; margin-top: 10px; padding: 7px 14px; background: rgba(79,255,176,0.1); color: var(--accent); text-decoration: none; font-size: 13px; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 Job Hunter Bot</h1>
+        <nav>
+            <a href="/">Vagas</a>
+            <a href="/config">Configuração</a>
+            <a href="/run">Executar Coleta</a>
+            <a href="/clear" class="btn-clear">Limpar Vagas</a>
+        </nav>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="messages"><ul>{% for message in messages %}<li>{{ message }}</li>{% endfor %}</ul></div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- HTML (Permanece igual, apenas certifique-se dos IDs) -->
+<div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:center;">
+    <input type="text" id="filtro-cidade" placeholder="🔍 Cidade..." oninput="filtrarVagas()"
+           style="padding:10px; background:#181c2e; border:1px solid #2a2f4a; color:#e8eaf4; border-radius:9px; flex:1; min-width:200px;">
+
+    <label style="color:#7b82a6; font-size:13px;">De:</label>
+    <input type="date" id="data-inicio" onchange="filtrarVagas()"
+           style="padding:10px; background:#181c2e; border:1px solid #2a2f4a; color:#e8eaf4; border-radius:9px;">
+
+    <label style="color:#7b82a6; font-size:13px;">Até:</label>
+    <input type="date" id="data-fim" onchange="filtrarVagas()"
+           style="padding:10px; background:#181c2e; border:1px solid #2a2f4a; color:#e8eaf4; border-radius:9px;">
+
+    <button onclick="limparFiltro()"
+            style="padding:10px 16px; background:#1e2235; border:1px solid #2a2f4a; color:#7b82a6; border-radius:9px; cursor:pointer;">
+        ✕ Limpar
+    </button>
+</div>
+
+        <!--##################################-->
+
+        {% if categorias %}
+            {% for cat, vagas in categorias.items() %}
+                <div class="categoria">
+                    <h2>{{ cat }} ({{ vagas|length }} vagas)</h2>
+                    {% for vaga in vagas %}
+                        <div class="vaga" data-data="{% if vaga.data_coleta %}{{ vaga.data_coleta[:10] }}{% elif vaga.data_postagem %}{{ vaga.data_postagem[:10] }}{% else %}9999-12-31{% endif %}" data-cidade="{{ vaga.localizacao|lower }}">
+                            <h3>{{ vaga.titulo }}</h3>
+                            <p><strong>Empresa:</strong> {{ vaga.empresa }}</p>
+                            <p><strong>Localização:</strong> {{ vaga.localizacao }}</p>
+                            <p><strong>Plataforma:</strong> {{ vaga.plataforma }}</p>
+                            <a href="{{ vaga.url }}" target="_blank">🔗 Ver Vaga</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <p style="text-align: center; color: var(--muted); padding: 40px;">Nenhuma vaga coletada.</p>
+        {% endif %}
+        <!--####################-->
+        <script>
+function filtrarVagas() {
+    const cidadeTermo = document.getElementById('filtro-cidade').value.toLowerCase().trim();
+    const dataInicio = document.getElementById('data-inicio').value;
+    const dataFim = document.getElementById('data-fim').value;
+
+    document.querySelectorAll('.vaga').forEach(vaga => {
+        const cidadeVaga = (vaga.dataset.cidade || '').toLowerCase();
+        const dataVaga = vaga.dataset.data || '';
+
+        // Filtro de Cidade/Localização
+        const matchesCidade = !cidadeTermo ||
+                              cidadeVaga.includes(cidadeTermo);
+
+        // Filtro de Intervalo de Datas
+        let matchesData = true;
+        if (dataInicio || dataFim) {
+            if (dataInicio && dataVaga < dataInicio) matchesData = false;
+            if (dataFim && dataVaga > dataFim) matchesData = false;
+        }
+
+        vaga.style.display = (matchesCidade && matchesData) ? '' : 'none';
+    });
+
+    // Ocultar categorias sem resultados
+    document.querySelectorAll('.categoria').forEach(cat => {
+        const visiveis = [...cat.querySelectorAll('.vaga')].some(v => v.style.display !== 'none');
+        cat.style.display = visiveis ? '' : 'none';
+    });
+}
+
+function limparFiltro() {
+    document.getElementById('filtro-cidade').value = '';
+    document.getElementById('data-inicio').value = '';
+    document.getElementById('data-fim').value = '';
+    filtrarVagas();
+}
+</script>
+        <!--####################-->
+    </div>
+</body>
+</html>

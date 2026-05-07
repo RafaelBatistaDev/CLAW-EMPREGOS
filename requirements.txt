@@ -1,0 +1,9 @@
+# Job Hunter Bot — Dependências Python
+# Instalar dentro de um Distrobox/venv (recomendado no Kinoite/COSMIC)
+
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+lxml>=4.9.0
+flask>=2.3.0
+openpyxl>=3.1.0
+instaloader>=4.10.0
